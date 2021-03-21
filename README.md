@@ -11,21 +11,18 @@ Checks if Windows Cluster Roles are on preferred Node(s)
 
 ## HOW TO
 
-1. Place "PRTG-PrefClusterNodes.ps1" under "C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXE"
+1. Place "PRTG-PrefClusterNodes.ps1" under "C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML"
 
 2. Create Sensor and set "Use Windows credentials of parent device" 
 
-3. Change "Value" Channel >> "Lookups and Limits" to "Enable alerting based on limits"
-   - Upper Error Limit 0,5
-![PRTG-PrefClusterNodes](media/Sensor-Limit-Channel.png)
-![PRTG-PrefClusterNodes](media/Sensor-Limit.png)
-
 4. Set the "$IgnorePattern" or "$IgnoreScript" parameter to Exclude ClusterGroups
+
+5. If you want the Sensor to return Error and not Warning change the Channel Limit.
 
 
 ## Examples
-![PRTG-PrefClusterNodes](media/Limits-OK.png)
-![PRTG-PrefClusterNodes](media/Limits-Error.png)
+![PRTG-PrefClusterNodes](media/PrefClusterNodes-OK.png)
+![PRTG-PrefClusterNodes](media/PrefClusterNodes-Warning.png)
 
 ClusterGroup exceptions
 ------------------
