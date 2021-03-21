@@ -1,4 +1,4 @@
-﻿<#       
+<#       
     .SYNOPSIS
     Checks if Windows Cluster Roles are on preferred Node(s)
 
@@ -6,10 +6,12 @@
     Using WMI to check if all Cluster Roles from one Cluster are on preferred Nodes
     Exceptions can be made within this script by changing the variable $IgnoreScript. This way, the change applies to all PRTG sensors 
     based on this script. If exceptions have to be made on a per sensor level, the script parameter $IgnorePattern can be used.
-    Copy this script to the PRTG probe EXE scripts folder (${env:ProgramFiles(x86)}\PRTG Network Monitor\Custom Sensors\EXE)
-    and create a "EXE/Script" sensor. Choose this script from the dropdown and set at least:
-    + Parameters: Cluster
-    + Upper Error Limit 0,5
+    
+    Copy this script to the PRTG probe EXEXML scripts folder (${env:ProgramFiles(x86)}\PRTG Network Monitor\Custom Sensors\EXEXML)
+    and create a "EXE/Script Advanced" sensor. Choose this script from the dropdown and set at least:
+    
+    + Parameters: -Cluster BeispielCLuster
+    + Security Context: Use Windows credentials of parent device
 
     .PARAMETER Cluster
     The Hostname of the Windows Cluster
@@ -21,9 +23,8 @@
     #https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_regular_expressions?view=powershell-7.1
     
     .EXAMPLE
-    Sample call from PRTG EXE/Script
-    EXE/Script= PRTG-PrefClusterNodes.ps1
-    Parameters= -Cluster "Fileserver-Test"
+    Sample call from PRTG EXE/Script Advanced
+    PRTG-PrefClusterNodes.ps1 -Cluster "Fileserver-Test"
 
     Author:  Jannos-443
     https://github.com/Jannos-443/PRTG-PrefClusterNodes
@@ -35,18 +36,24 @@ param(
 
 #catch all unhadled errors
 trap{
-    Write-Host "1:$($_.ToString()) $($_.ScriptStackTrace)"
-    Exit 1
+    Write-Output "<prtg>"
+    Write-Output " <error>1</error>"
+    Write-Output " <text>$($_.ToString() - $($_.ScriptStackTrace))</text>"
+    Write-Output "</prtg>"
+    Exit
 }
 
 #
 if($Cluster -eq $null)
     {
-    Write-Host "1:No Cluster specified"
-    exit 1
+    Write-Output "<prtg>"
+    Write-Output " <error>1</error>"
+    Write-Output " <text>No Cluster specified</text>"
+    Write-Output "</prtg>"
+    Exit
     }
 
-#Currently not in user because of PRTG 32-Bit Probe
+#Currently not in use because of PRTG 32-Bit Probe
 #Start Load Powershell Module
 #$module = Get-Module -Name "FailoverClusters" -ListAvailable -ErrorAction SilentlyContinue
 #
@@ -68,8 +75,11 @@ Try{
     }
 
 catch{
-    Write-Host "1:Cluster $($Cluster) not found or access denied"
-    exit 1
+    Write-Output "<prtg>"
+    Write-Output " <error>1</error>"
+    Write-Output " <text>Cluster $($Cluster) not found or access denied</text>"
+    Write-Output "</prtg>"
+    Exit
     }
 
 
@@ -91,19 +101,24 @@ if ($IgnoreScript -ne "") {
 
 if(($ClusterGroups -eq 0) -or ($ClusterGroups -eq $null))
     {
-    Write-Host "1:No ClusterGroups found"
-    exit 1
+    Write-Output "<prtg>"
+    Write-Output " <error>1</error>"
+    Write-Output " <text>No ClusterGroups found</text>"
+    Write-Output "</prtg>"
+    Exit
     }
 
 #get preferred node for each ClusterGroup
 $ErrorText = ""
 $AllNodes = ""
+$OnWrongNodes = 0
 
 foreach($ClusterGroup in $ClusterGroups)
     {
     #get preferred node(s)
     #$PrefClusterNode = ((Get-ClusterOwnerNode -Cluster $Cluster -Group $ClusterGroup.Name).OwnerNodes).Name
     $PrefClusterNode = (Invoke-CimMethod -InputObject $ClusterGroup -MethodName GetPreferredOwners -ErrorAction Stop).NodeNames
+    $PrefClusterNode = "Cluster-F2"
     $PrefNodesTXT= ""
     $AllNodes += "$($ClusterGroup.Name) ;"
         
@@ -121,19 +136,34 @@ foreach($ClusterGroup in $ClusterGroups)
         if($ClusterGroup.OwnerNode -notin $PrefClusterNode)
             {
             $ErrorText += "$($ClusterGroup.name) is not on preferred Node $($PrefNodesTXT)"
+            $OnWrongNodes += 1
             }
         }
     }
 
-
+$xmlOutput = '<prtg>'
+# Output Text if all ClusterGroups are on preferred Nodes
 if(($ErrorText -eq $null) -or($ErrorText -eq ""))
     {
-    Write-Host "0:All ClusterGroups are on preferred Nodes ClusterGroups=$($AllNodes)"
-    exit 0
+    $xmlOutput = $xmlOutput + "<text>All ClusterGroups are on preferred Nodes ClusterGroups=$($AllNodes)</text>"
     }
 
+# Output Text if one or more ClusterGroups are no on preferred Nodes
 else
     {
-    Write-Host "1:$($ErrorText)"
-    exit 1
+    $xmlOutput = $xmlOutput + "<text>$($ErrorText)</text>"
     }
+
+
+# Output Graph Data
+$xmlOutput = $xmlOutput + "<result>
+        <channel>ClusterGroups on wrong Node</channel>
+        <value>$OnWrongNodes</value>
+        <unit>Count</unit>
+        <limitmode>1</limitmode>
+        <LimitMaxWarning>0.1</LimitMaxWarning>
+        </result>"
+
+$xmlOutput = $xmlOutput + "</prtg>"
+
+$xmlOutput
