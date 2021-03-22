@@ -118,7 +118,6 @@ foreach($ClusterGroup in $ClusterGroups)
     #get preferred node(s)
     #$PrefClusterNode = ((Get-ClusterOwnerNode -Cluster $Cluster -Group $ClusterGroup.Name).OwnerNodes).Name
     $PrefClusterNode = (Invoke-CimMethod -InputObject $ClusterGroup -MethodName GetPreferredOwners -ErrorAction Stop).NodeNames
-    $PrefClusterNode = "Cluster-F2"
     $PrefNodesTXT= ""
     $AllNodes += "$($ClusterGroup.Name) ;"
         
