@@ -1,4 +1,4 @@
-# PRTG-PrefClusterNodes
+# PRTG-MSCluster-PrefNodes
 # About
 
 ## Project Owner:
@@ -11,7 +11,7 @@ Checks if Windows Cluster Roles are on preferred Node(s)
 
 ## HOW TO
 
-1. Place "PRTG-PrefClusterNodes.ps1" under "C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML"
+1. Place "PRTG-MSCluster-PrefNodes.ps1" under "C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML"
 
 2. Create Sensor and set "Use Windows credentials of parent device" 
 
@@ -21,8 +21,8 @@ Checks if Windows Cluster Roles are on preferred Node(s)
 
 
 ## Examples
-![PRTG-PrefClusterNodes](media/PrefClusterNodes-OK.png)
-![PRTG-PrefClusterNodes](media/PrefClusterNodes-Warning.png)
+![PRTG-MSCluster-PrefNodes](media/PrefClusterNodes-OK.png)
+![PRTG-MSCluster-PrefNodes](media/PrefClusterNodes-Warning.png)
 
 ClusterGroup exceptions
 ------------------
