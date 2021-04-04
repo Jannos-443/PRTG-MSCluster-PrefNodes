@@ -21,8 +21,8 @@ Checks if Windows Cluster Roles are on preferred Node(s)
 
 
 ## Examples
-![PRTG-MSCluster-PrefNodes](media/PrefClusterNodes-OK.png)
-![PRTG-MSCluster-PrefNodes](media/PrefClusterNodes-Warning.png)
+![PRTG-MSCluster-PrefNodes](media/OK.png)
+![PRTG-MSCluster-PrefNodes](media/Warning.png)
 
 ClusterGroup exceptions
 ------------------
