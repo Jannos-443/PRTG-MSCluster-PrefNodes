@@ -13,7 +13,7 @@ Checks if Windows Cluster Roles are on preferred Node(s)
 
 1. Place `PRTG-MSCluster-PrefNodes.ps1` under `C:\Program Files (x86)\PRTG Network Monitor\Custom Sensors\EXEXML`
 
-2. Create Sensor and set **Use Windows credentials of parent device**
+2. Create Sensor (EXE/Script Advanced) and set **Use Windows credentials of parent device**
 
 4. Set the `$IgnorePattern` or `$IgnoreScript` parameter to Exclude ClusterGroups
 
